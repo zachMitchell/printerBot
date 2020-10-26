@@ -12,7 +12,7 @@ const imageSpace = [8.26, 11.69];
 function makeDocument(text='',images=[]){
     var doc = new jsPDF({unit:'in'});
     doc.setFontSize(11);
-    doc.text(text, 0.2,.3,{maxWidth:7.5});
+    doc.text(text, 0.2,1,{maxWidth:7.5});
 
     /*Image handling will be complicated, but the gist:
     If it's a single image: display it at full res except when you can't
