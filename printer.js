@@ -14,9 +14,14 @@ const cooldownGroup = new cooldown.guildGroup();
 var cooldownDefaults = {
     'printGroup':{
         isGroup: true,
-        cooltime:3600,
+        coolTime:3600,
         uses:1,
+        glue:true,
         commands:['print','printq']
+    },
+    'printhelp':{
+        coolTime:180,
+        uses:1
     }
 }
 
@@ -35,8 +40,13 @@ client.on('message',msg=>{
             if(guild && !cooldownGroup[guild.id])
                 cooldownGroup.createConfig(msg.channel.guild.id,cooldownDefaults)
             
-            //This function tracks the command's use. If we can't use it, don't run the command.
-            var cooldownResults = cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
+            var cooldownResults = [];
+            //Ignore the cooldown if the message is blank; probably need something more graceful soon :/
+            if(!((actualCommand == 'print' || actualCommand == 'printq') && args.length == 1)){
+                //This function tracks the command's use. If we can't use it, don't run the command.
+                cooldownResults = cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
+            }
+                
             //Run the comand
             if(!guild){
                 msg.reply('Nice try >:)\nI can only be used on a discord server! If you want to print in secret on a server, just use `/printq`');
@@ -49,11 +59,17 @@ client.on('message',msg=>{
             }
 
             //If the command was disabled, show this message
-            else if(cooldownResults[0] === null && !cooldownResults[1])
-                msg.reply('The '+actualCommand+' command has been turned off...');
-            //If the user hasn't tried typing the command twice, show this message if cooldown is present
-            else if(cooldownResults[0])
-                msg.reply('You already printed! Please wait '+Math.ceil(cooldownResults[2] / 60)+' more minutes before printing again :)');
+            else if(!cooldownResults[1]){
+                if(cooldownResults[0] === null)
+                    msg.reply('The '+actualCommand+' command has been turned off...');
+                //If the user hasn't tried typing the command twice, show this message if cooldown is present
+                else if(cooldownResults[0] && ['print','printq'].indexOf(actualCommand) > -1)
+                    msg.reply('You already printed! Please wait '+Math.ceil(cooldownResults[2] / 60)+' more minutes before printing again :)');
+                else if(cooldownResults[0]){
+                    msg.reply('*Cooldown hit; please wait '+Math.ceil(cooldownResults[2])+' more seconds to run this command again*');
+                }
+            }
+
             //If the user tried again, don't respond back.
         }
     }

@@ -16,6 +16,11 @@ delete moduleList;
 
 var commands = {
     'print':(m,args,quiet)=>{
+        if(args.length == 1 && m.attachments.size === 0){
+            m.channel.send('*(Error: Message was blank, so nothing will be sent to the printer. For help, use `/printhelp`)*')
+            return;
+        }
+        
         if(quiet) m.delete();
 
         m.reply('Now generating the page, this could take a little while...');
@@ -48,8 +53,11 @@ var commands = {
         
         if(!links.length){
             var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
-            customModules.printCommand(m.author.username+": "+m.content).save(saveDate);
-            m.reply(finishedMsg);
+            customModules.printCommand(m.author.username+": "+args.slice(1).join(" ")).save(saveDate);
+            exec('lp '+saveDate,(err,out,stderr)=>{
+                console.log(err,out,stderr);
+                m.reply(finishedMsg);
+            });
         }
         else{
             //Download absolutely everything, then add the attachments to the image plus the message text
@@ -59,17 +67,19 @@ var commands = {
                     imgArrays.push(new Uint8Array(i));
 
                 var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
-                var newDoc = customModules.printCommand(m.author.username+": "+args.slice(1).join(" "),imgArrays);
-                newDoc.save(saveDate);
+                customModules.printCommand(m.author.username+": "+args.slice(1).join(" "),imgArrays).save(saveDate);
                 exec('lp '+saveDate,(err,out,stderr)=>{
                     console.log(err,out,stderr);
                     m.reply(finishedMsg);
-                })
+                });
             },['jpg','jpeg','png','gif']);
         }
 
     },
-    'printq':(m,args)=>commands.print(m,args,true)
+    'printq':(m,args)=>commands.print(m,args,true),
+    'printhelp':(m,args)=>{
+        m.channel.send("To use me, just use `/print` and write down a message! That message along with any linked / attached pictures will be sent in for printing.\nIf you don't want anyone to know what you're sending, use `/printq` instead (doesn't prevent notifications)");
+    }
 }
 
 module.exports = commands;
