@@ -14,7 +14,7 @@ const cooldownGroup = new cooldown.guildGroup();
 var cooldownDefaults = {
     'printGroup':{
         isGroup: true,
-        coolTime:3600,
+        coolTime:12600, //3 hours, 30 minutes
         uses:1,
         glue:true,
         commands:['print','printq']
@@ -34,28 +34,27 @@ client.on('message',msg=>{
         var args = msg.content.split(' ');
         var actualCommand = args[0].substring(1);
 
-        if(commands[actualCommand]){
+        if(commands[actualCommand] && !msg.author.bot){
             //Setup command cooldown for this guild. If there's no config we have defaults
             var guild = msg.channel.guild;
-            if(guild && !cooldownGroup[guild.id])
-                cooldownGroup.createConfig(msg.channel.guild.id,cooldownDefaults)
-            
-            var cooldownResults = [];
-            //Ignore the cooldown if the message is blank; probably need something more graceful soon :/
-            if(!((actualCommand == 'print' || actualCommand == 'printq') && args.length == 1)){
-                //This function tracks the command's use. If we can't use it, don't run the command.
-                cooldownResults = cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
-            }
-                
             //Run the comand
             if(!guild){
                 msg.reply('Nice try >:)\nI can only be used on a discord server! If you want to print in secret on a server, just use `/printq`');
                 return;
             }
 
+            if(guild && !cooldownGroup[guild.id])
+                cooldownGroup.createConfig(msg.channel.guild.id,cooldownDefaults)
+            
+            var cooldownResults = [];
+            //This function tracks the command's use. If we can't use it, don't run the command.
+            cooldownResults = cooldownGroup[msg.channel.guild.id].updateUsage(actualCommand,msg);
+
             if(guild && !cooldownResults[0]){
                 // console.log(msg);
-                commands[actualCommand](msg,args);
+                var commandResults = commands[actualCommand](msg,args);
+                if(typeof commandResults == 'object' && commandResults.cooldownAppend)
+                    cooldownGroup[msg.channel.guild.id].appendSeconds(actualCommand,msg,commandResults.cooldownAppend);
             }
 
             //If the command was disabled, show this message

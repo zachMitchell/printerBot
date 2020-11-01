@@ -9,18 +9,19 @@ const imageSpace = [8.26, 11.69];
 
 
 //Images must be in UInt8Array format before sending to this function
-function makeDocument(text='',images=[]){
+function makeDocument(text='',images=[],userIcon){
     var doc = new jsPDF({unit:'in'});
     doc.setFontSize(11);
-    doc.text(text, 0.2,1,{maxWidth:7.5});
+    doc.text((userIcon?"        ":'')+text, 0.2,1,{maxWidth:7.5});
 
+    if(userIcon) doc.addImage(userIcon,'png',0.2,.8,...measureTools.inchToPx([50,50]));
+    
     /*Image handling will be complicated, but the gist:
     If it's a single image: display it at full res except when you can't
     If there are multiple images: display in a grid.
     
     In the future I want to perfect a jigsaw algorythm but the general concept phase isn't working out very well
     (jigsaw: basically jam each picture in like a puzzle piece successfully)*/
-
     if(images.length){
 
         //Determine realestate available for inserting images:
@@ -38,7 +39,7 @@ function makeDocument(text='',images=[]){
                 adjustedWH = measureTools.aspectRatio(adjustedWH,imageSpace[1] - a4Offset);
             
             //Insert the image:
-            doc.addImage(imageProps[0].data,imageProps[0].extension,0,a4Offset,adjustedWH.width,adjustedWH.height);
+            doc.addImage(imageProps[0].data,imageProps[0].extension,0.2,a4Offset,adjustedWH.width,adjustedWH.height);
         }
     
         //Figure out if we can tile the images, if not; we place them in a grid instead (way less taxing)
@@ -101,11 +102,11 @@ function imageGrid(imageData,doc){
         (imageSpace[1] - a4Offset) / Math.ceil(Math.sqrt(imageData.length))
     ];
 
-    var currOffset = [0,a4Offset];
+    var currOffset = [0.2,a4Offset];
     for(var i of imageData){
         console.log(currOffset[0],currOffset[0]+sizePerImage[0],imageSpace[0])
         if(currOffset[0] + sizePerImage[0] > imageSpace[0]){
-            currOffset[0] = 0;
+            currOffset[0] = 0.2;
             currOffset[1] += sizePerImage[1];
         }
 

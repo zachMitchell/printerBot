@@ -76,9 +76,22 @@ guild.prototype.updateUsage = function(cmd,message){
     }
 }
 
+//Adds more time to the clock to potentially reset a command for a user or extend waiting time
+guild.prototype.appendSeconds = function(cmd, msg, timeInSeconds = 0){
+    var targetCommand,
+        commandUser,
+        userId = msg.author.id;
+
+    if(!(targetCommand = this.commands[cmd])) return;
+
+    if(!(commandUser = targetCommand.users[userId]))
+        commandUser = targetCommand.users[userId] = new user(userId,targetCommand.uses,timeStamp);
+    
+    commandUser.timeStamp += 1000*timeInSeconds;
+}
+
 function command(uses = 1,coolTime = 30){
     this.uses = uses;
-    this.triedAgain = true;
     this.coolTime = coolTime;
     this.users = {}; //Use this to store user objects
 }
@@ -87,6 +100,7 @@ function user(id = '',usesLeft = 1, timeStamp = 0){
     this.id = id;
     this.usesLeft = usesLeft;
     this.timeStamp = timeStamp;
+    this.triedAgain = false;
 }
 
 function guildGroup(){}
