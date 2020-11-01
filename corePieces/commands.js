@@ -1,7 +1,8 @@
 //Made by Zachary Mitchell in 2020!
-//Stripped down script from another bot of mine to offer the print command or any other commands for the future.
 
+//Stripped down script from another bot of mine to offer the print command or any other commands for the future.
 //Load the modules!
+const { exec } = require("child_process");
 var customModules = {};
 
 //These are file names you can find from customModules. For example: mentionTools.js would be mentionTools here.
