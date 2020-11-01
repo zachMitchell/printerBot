@@ -62,8 +62,10 @@ client.on('message',msg=>{
                 if(cooldownResults[0] === null)
                     msg.reply('The '+actualCommand+' command has been turned off...');
                 //If the user hasn't tried typing the command twice, show this message if cooldown is present
-                else if(cooldownResults[0] && ['print','printq'].indexOf(actualCommand) > -1)
-                    msg.reply('You already printed! Please wait '+Math.ceil(cooldownResults[2] / 60)+' more minutes before printing again :)');
+                else if(cooldownResults[0] && ['print','printq'].indexOf(actualCommand) > -1){
+                    var waitTime = Math.ceil(cooldownResults[2] / 60);
+                    msg.reply('You already printed! Please wait '+(waitTime < 60 ? waitTime + 'more minutes':(waitTime/60)+' more hours')+' before printing again :)');
+                }
                 else if(cooldownResults[0]){
                     msg.reply('*Cooldown hit; please wait '+Math.ceil(cooldownResults[2])+' more seconds to run this command again*');
                 }

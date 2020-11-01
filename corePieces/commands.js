@@ -16,7 +16,7 @@ var commands = {
     'print':(m,args,quiet)=>{
         if(args.length == 1 && m.attachments.size === 0){
             m.channel.send('*(Error: Message was blank, so nothing will be sent to the printer. For help, use `/printhelp`)*')
-            return { cooldownAppend: -9001 };
+            return { cooldownAppend: -12600 };
         }
         
         if(quiet) m.delete();
@@ -43,7 +43,7 @@ function execPrint(m,args,userIcon = null){
         var currStr = '';
         var inLink = false;
         var iconResult = userIcon ? new Uint8Array(userIcon) : undefined;
-        var filteredText = mentionTools.replaceMentionTags(m,args.slice(1).join(" "));
+        var filteredText = customModules.mentionTools.replaceMentionTags(m,args.slice(1).join(" "));
         for(var i =0;i < m.content.length;i++){
             //Messy if statement, could probably be cut down :P
             if(m.content[i] == 'h' && (m.content.substring(i,i+7) == 'http://' || m.content.substring(i,i+8) == 'https://'))
