@@ -115,3 +115,13 @@ Other values in that config:
 
 * Sometimes google chrome saves jpgs in a more compressed format they built called "webp". JSPDF doesn't like this, and therefore my current workaround at the moment is to block these from coming in. I assume this happens when somebody tries to save an image straight from google photos, but this almost never happens
 * Custom emoji
+
+# Special Thanks
+
+THANK YOU EVERYONE in the server of friends I hang out in for making printerbot who he is. It makes me really happy to bring him to life, but it's all thanks to everyone on said server that brought him personality. There are more than a dozen things I wouldn't have imagined getting inked onto a piece of paper, but you know what? I don't regret a single print XD
+
+# License
+
+![Creative Commons Attribution License](https://i.creativecommons.org/l/by/4.0/88x31.png)
+
+This work is licensed under a [Creative Commons Attribution 4.0 International License.](http://creativecommons.org/licenses/by/4.0/)
