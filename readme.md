@@ -1,6 +1,6 @@
 # Printer Bot
 
-![Printer bot]('/readmeAssets/printer.jpg')
+![Printer Bot](./readmeAssets/printer.jpg)
 
 Welcome! `Printer Bot` is a discord bot that lives up to it's name: people can print on command via discord to your precious ink consuming compadre. Is that a good Idea? Probably not, but at the same time you should totally do it anyway for reasons.
 
@@ -11,11 +11,17 @@ Welcome! `Printer Bot` is a discord bot that lives up to it's name: people can p
 
 ## Example pages
 
-![I get these allot]('/readmeAssets/windexPoptart.jpeg')
+![I get these allot](/readmeAssets/windexPoptart.jpeg)
 
-![Images display around 60% of the paper when allowed]('/readmeAssets/bigImage.jpeg')
+I get these allot
 
-![An image before user icons were in the top right corner. Shows allot of images on one paper]('/readmeAssets/taohao.jpeg')
+![Images display around 60% of the paper when allowed](/readmeAssets/bigImage.jpeg)
+
+Images display around 60% of the paper when allowed
+
+![An image before user icons were in the top right corner. Shows allot of images on one paper](/readmeAssets/taohao.jpeg)
+
+An image before user icons were in the top right corner. Shows allot of images on one paper
 
 
 ## Structure
