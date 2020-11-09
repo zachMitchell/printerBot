@@ -14,7 +14,7 @@ for(i of moduleList)
 delete moduleList;
 
 var commands = {
-    'print':(m,args,quiet)=>{
+    'print':(m,args,cooldown,quiet)=>{
         if(args.length == 1 && m.attachments.size === 0){
             m.channel.send('*(Error: Message was blank, so nothing will be sent to the printer. For help, use `/printhelp`)*')
             return { cooldownAppend: -12600 };
@@ -24,18 +24,18 @@ var commands = {
 
         //Icon is obtained and then everything else runs.
         if(m.author.avatar!=null)
-            customModules.grabFromTheInternet.downloadSingle('https://cdn.discordapp.com/avatars/'+m.author.id+'/'+m.author.avatar+'.png',e=>execPrint(m,args,e),['png']);
-        else execPrint(m,args);
+            customModules.grabFromTheInternet.downloadSingle('https://cdn.discordapp.com/avatars/'+m.author.id+'/'+m.author.avatar+'.png',e=>execPrint(m,args,e,cooldown),['png']);
+        else execPrint(m,args,null,cooldown);
 
     },
-    'printq':(m,args)=>commands.print(m,args,true),
+    'printq':(m,args,cooldown)=>commands.print(m,args,cooldown,true),
     'printhelp':(m,args)=>{
         m.channel.send("To use me, just use `/print` and write down a message! That message along with any linked / attached pictures will be sent in for printing.\nIf you don't want anyone to know what you're sending, use `/printq` instead (doesn't prevent notifications)");
     }
 }
 
 //Print command is getting really big so it's being placed down here:
-function execPrint(m,args,userIcon = null){
+function execPrint(m,args,userIcon = null,cooldown){
     m.reply('Now generating the page, this could take a little while...');
         
         var finishedMsg = 'Your page is now being printed!';
@@ -78,8 +78,17 @@ function execPrint(m,args,userIcon = null){
             //Download absolutely everything, then add the attachments to the image plus the message text
             customModules.grabFromTheInternet.downloadMulti(links,e=>{
                 var imgArrays = [];
-                for(var i of e)
+                for(var i of e){
+                    //make sure we don't hit WEBPVP8 (jspdf doesn't seem to handle this well for now)
+                    if(i.toString().indexOf('WEBPVP8') > -1){
+                        m.reply('Sorry, it looks like one of your jpgs was using the `WEBP` format which I can\'t Process :/\nTry saving the image in a different format and print again, your cooldown has been lifted.');
+                        cooldown.appendSeconds('printGroup',m,-12600);
+                        return;
+                    }
+
                     imgArrays.push(new Uint8Array(i));
+                    console.log(imgArrays[imgArrays.length-1].toString());
+                }
 
                 var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
                 customModules.printCommand(m.author.username+": "+filteredText,imgArrays,iconResult).save(saveDate);

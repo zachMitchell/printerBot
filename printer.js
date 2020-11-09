@@ -52,7 +52,7 @@ client.on('message',msg=>{
 
             if(guild && !cooldownResults[0]){
                 // console.log(msg);
-                var commandResults = commands[actualCommand](msg,args);
+                var commandResults = commands[actualCommand](msg,args,cooldownGroup[msg.channel.guild.id]);
                 if(typeof commandResults == 'object' && commandResults.cooldownAppend)
                     cooldownGroup[msg.channel.guild.id].appendSeconds(actualCommand,msg,commandResults.cooldownAppend);
             }
