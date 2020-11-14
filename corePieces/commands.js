@@ -6,7 +6,7 @@ const { exec } = require("child_process");
 var customModules = {};
 
 //These are file names you can find from customModules. For example: mentionTools.js would be mentionTools here.
-var moduleList = ['printCommand','grabFromTheInternet','mentionTools'];
+var moduleList = ['printCommand','grabFromTheInternet','mentionTools','youtubeLinkTools'];
 
 for(i of moduleList)
     customModules[i] = require('../customModules/'+i+'.js');
@@ -65,6 +65,11 @@ function execPrint(m,args,userIcon = null,cooldown){
         //Grab links to actual attachments, doesn't matter if they're images or not, that will be filtered later
         for(var i of m.attachments)
             links.push(i[1].attachment);
+
+        //Grab youtube thumbnails
+        var thumbnails = customModules.youtubeLinkTools.detectLinks(filteredText);
+        if(thumbnails.length)
+            for(var i of thumbnails) links.push(customModules.youtubeLinkTools.makeThumbnailLink(i));
         
         if(!links.length){
             var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
@@ -87,7 +92,7 @@ function execPrint(m,args,userIcon = null,cooldown){
                     }
 
                     imgArrays.push(new Uint8Array(i));
-                    console.log(imgArrays[imgArrays.length-1].toString());
+                    // console.log(imgArrays[imgArrays.length-1].toString());
                 }
 
                 var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
