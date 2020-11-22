@@ -5,7 +5,7 @@ const measureTools = require('./jsPdfMeasureTools');
 
 
 const a4Offset = 4.25 //where 4.25 is the sweet spot for roughly half the page
-const imageSpace = [8.26, 11.69];
+const imageSpace = [8.06, 11.69]; //would be 8.26 - but my printer doesn't work with a4 that well
 
 
 //Images must be in UInt8Array format before sending to this function
@@ -28,6 +28,8 @@ function makeDocument(text='',images=[],userIcon){
         //Grab all image properties
         var imageProps = [];
         for(var i of images) imageProps.push(new imgObj(i,doc.getImageProperties(i)));
+
+        // console.log('length:'+imageProps.length);
 
         if(imageProps.length == 1){
             var adjustedWH = {width:imageProps[0].dim[0],height:imageProps[0].dim[1]};
@@ -102,11 +104,11 @@ function imageGrid(imageData,doc){
         (imageSpace[1] - a4Offset) / Math.ceil(Math.sqrt(imageData.length))
     ];
 
-    var currOffset = [0.2,a4Offset];
+    var currOffset = [0,a4Offset];
     for(var i of imageData){
-        console.log(currOffset[0],currOffset[0]+sizePerImage[0],imageSpace[0])
+        // console.log(currOffset[0],currOffset[0]+sizePerImage[0],imageSpace[0])
         if(currOffset[0] + sizePerImage[0] > imageSpace[0]){
-            currOffset[0] = 0.2;
+            currOffset[0] = 0;
             currOffset[1] += sizePerImage[1];
         }
 
@@ -114,7 +116,8 @@ function imageGrid(imageData,doc){
         let newDimensions = measureTools.aspectRatio({width:i.dim[0],height:i.dim[1]},adjustedBaseSize);
         // console.log(newDimensions,adjustedBaseSize);
 
-        doc.addImage(i.data,i.extension,currOffset[0],currOffset[1],newDimensions.width,newDimensions.height);
+        //the .2 is my printer's offset (see imageSpace as well)
+        doc.addImage(i.data,i.extension,currOffset[0]+.2,currOffset[1],newDimensions.width,newDimensions.height);
         currOffset[0]+=sizePerImage[0];
     } 
 }

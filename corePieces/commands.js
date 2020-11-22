@@ -81,7 +81,7 @@ function execPrint(m,args,userIcon = null,cooldown){
         }
         else{
             //Download absolutely everything, then add the attachments to the image plus the message text
-            customModules.grabFromTheInternet.downloadMulti(links,e=>{
+            customModules.grabFromTheInternet.downloadMulti(links,(e,badLinks)=>{
                 var imgArrays = [];
                 for(var i of e){
                     //make sure we don't hit WEBPVP8 (jspdf doesn't seem to handle this well for now)
@@ -96,11 +96,32 @@ function execPrint(m,args,userIcon = null,cooldown){
                 }
 
                 var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
-                customModules.printCommand(m.author.username+": "+filteredText,imgArrays,iconResult).save(saveDate);
-                exec('lp '+saveDate,(err,out,stderr)=>{
-                    console.log(err,out,stderr);
-                    m.reply(finishedMsg);
-                });
+                //Run this if we don't have qrcodes to generate, otherwise, wait until qrcodes are done generating
+                var printEverything=()=>{
+                    customModules.printCommand(m.author.username+": "+filteredText,imgArrays,iconResult).save(saveDate);
+                    exec('lp '+saveDate,(err,out,stderr)=>{
+                        console.log(err,out,stderr);
+                        m.reply(finishedMsg);
+                    });
+                }
+
+                if(badLinks.length){
+                    //Qr code generation!
+                    var resultBuffers = [];
+                    for(let i of badLinks) exec('qrencode -o - '+i,{encoding:'Buffer'},(err,out,stdout)=>{
+                        try{
+                            resultBuffers.push(new Uint8Array(out));
+                            if(resultBuffers.length == badLinks.length){
+                                imgArrays.push(...resultBuffers);
+                                printEverything();
+                            }
+                        }
+                        catch(e){
+                            console.error(e);
+                        }
+                    });
+                }
+                else printEverything();
             },['jpg','jpeg','png','gif']);
         }
 }

@@ -8,7 +8,7 @@ function detectLinks(str){
     for(var i = 0;i < str.length;i++){
         //youtube.com
         if(str.substring(i,i+queries[0].length) == queries[0]){
-            console.log(str.substring(i,i+queries[0].length));
+            // console.log(str.substring(i,i+queries[0].length));
             //Grab v= and obtain them link. watch?v= won't work because somebody could troll the system and use something like t= instead
             var resultSearch = filterLinkCode(str.substring(i).split('v=')[1]);
             if(resultSearch) results.push(resultSearch);

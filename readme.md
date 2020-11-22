@@ -8,6 +8,8 @@ Welcome! `Printer Bot` is a discord bot that lives up to it's name: people can p
 * Print as many pictures on a page as your cpu can crunch. Images fit inside a dynamic grid; Stressed tested to hold well over 50 images on one page.
 * @mentions - print names of users, bots and roles!
 * Cooldowns - limit how many pages users can print at one time.
+* Youtube Thumbnails show up when a link to youtube is present! (U.S based links only)
+* Any other links get added as qr-codes for you to scan (youtube links also get qr-codes)
 
 ## Example pages
 
@@ -32,7 +34,7 @@ Printerbot can run on just about anything; my server is an ancient raspberry Pi 
 
 ## Setting up
 
-Setting up printerbot is a piece of cake, your main ingredients are as follows: node, npm, cups, screen, discord.js, jspdf
+Setting up printerbot is a piece of cake, your main ingredients are as follows: node, npm, cups, screen, discord.js, jspdf, qrencode
 
 *note*: The raspberry pi B+ is really old, and therefore did not have node or npm in the raspbian repositories (it uses armv6, which node supports but no builds are available). For this setup I resorted to installing an older version of node and manually moving npm modules from a computer that uses npm.
 
@@ -43,6 +45,8 @@ The recommended way to install node is actually by installing npm first. On debi
 After installing node and npm, run `npm install`; which should install Discord.js and jspdf locally.
 
 You will also need screen which is installed through the same command (`sudo apt install screen`)
+
+By the same pattern above for installing npm and screen, install `qrencode`, this command allows printerbot to make qr-codes for links that were in the discord message. This will count as one image.
 
 ### Printer setup
 
