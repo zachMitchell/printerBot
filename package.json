@@ -1,6 +1,6 @@
 {
     "name": "printer-bot",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "main": "printer.js",
     "scripts": {
         "start": "node printer.js"
