@@ -19,13 +19,11 @@ var commands = {
             m.channel.send('*(Error: Message was blank, so nothing will be sent to the printer. For help, use `/printhelp`)*')
             return { cooldownAppend: -12600 };
         }
-        
-        if(quiet) m.delete();
 
         //Icon is obtained and then everything else runs.
         if(m.author.avatar!=null)
-            customModules.grabFromTheInternet.downloadSingle('https://cdn.discordapp.com/avatars/'+m.author.id+'/'+m.author.avatar+'.png',e=>execPrint(m,args,e,cooldown),['png']);
-        else execPrint(m,args,null,cooldown);
+            customModules.grabFromTheInternet.downloadSingle('https://cdn.discordapp.com/avatars/'+m.author.id+'/'+m.author.avatar+'.png',e=>execPrint(m,args,e,cooldown,quiet),['png']);
+        else execPrint(m,args,null,cooldown,quiet);
 
     },
     'printq':(m,args,cooldown)=>commands.print(m,args,cooldown,true),
@@ -35,7 +33,7 @@ var commands = {
 }
 
 //Print command is getting really big so it's being placed down here:
-function execPrint(m,args,userIcon = null,cooldown){
+function execPrint(m,args,userIcon = null,cooldown,quiet){
     m.reply('Now generating the page, this could take a little while...');
         
         var finishedMsg = 'Your page is now being printed!';
@@ -70,8 +68,19 @@ function execPrint(m,args,userIcon = null,cooldown){
         var thumbnails = customModules.youtubeLinkTools.detectLinks(filteredText);
         if(thumbnails.length)
             for(var i of thumbnails) links.push(customModules.youtubeLinkTools.makeThumbnailLink(i));
-        
+
+
+        //This guy counts how many instances of a link is used, everytime one passes through, we simply duplicate the end result when doing stuff like pictures or qr codes
+        var linkObj = {};
+
+        //Fill-er up:
+        for(var i of links){
+            if(!linkObj[i]) linkObj[i] = 1;
+            else linkObj[i]++;
+        }
+
         if(!links.length){
+            if(quiet) m.delete();
             var saveDate = './pdfArchive/'+(new Date().getTime())+".pdf";
             customModules.printCommand(m.author.username+": "+filteredText,undefined,iconResult).save(saveDate);
             exec('lp '+saveDate,(err,out,stderr)=>{
@@ -81,17 +90,19 @@ function execPrint(m,args,userIcon = null,cooldown){
         }
         else{
             //Download absolutely everything, then add the attachments to the image plus the message text
-            customModules.grabFromTheInternet.downloadMulti(links,(e,badLinks)=>{
+            customModules.grabFromTheInternet.downloadMulti(Object.keys(linkObj),(e,badLinks)=>{
+                if(quiet) m.delete();
                 var imgArrays = [];
                 for(var i of e){
                     //make sure we don't hit WEBPVP8 (jspdf doesn't seem to handle this well for now)
-                    if(i.toString().indexOf('WEBPVP8') > -1){
+                    if(i[0].toString().indexOf('WEBPVP8') > -1){
                         m.reply('Sorry, it looks like one of your jpgs was using the `WEBP` format which I can\'t Process :/\nTry saving the image in a different format and print again, your cooldown has been lifted.');
                         cooldown.appendSeconds('printGroup',m,-12600);
                         return;
                     }
 
-                    imgArrays.push(new Uint8Array(i));
+                    for(var j = 0; j < linkObj[i[1]];j++ )
+                        imgArrays.push(new Uint8Array(i[0]));
                     // console.log(imgArrays[imgArrays.length-1].toString());
                 }
 

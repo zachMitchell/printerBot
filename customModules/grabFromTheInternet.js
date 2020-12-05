@@ -10,7 +10,7 @@ function downloadMulti(listOfLinks, done = ()=>{}, types = [], listeners = {} ){
 
     //Everytime a download is finished we run this, when all downloads are attempted, run whatever function the user provided before running downloadMulti.
     var linkDone = (buffer,link)=>{
-        if(buffer) resultBuffers.push(buffer);
+        if(buffer) resultBuffers.push([buffer,link]);
         else badLinks.push(link);
         doneCount++;
         if(doneCount == listOfLinks.length){
